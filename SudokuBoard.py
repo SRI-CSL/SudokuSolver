@@ -16,6 +16,9 @@ from SudokuError import SudokuError
 class SudokuBoard(object):
     """
     Sudoku Board representation
+
+    iam: not really sure why we need this intermediate
+    representation.
     """
     def __init__(self, board_file):
         self.board = self.__create_board(board_file)
