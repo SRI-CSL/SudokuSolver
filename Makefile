@@ -41,10 +41,8 @@ lint: check_lint
 # for detecting just errors:
 	@ $(PYLINT) -E  *.py
 
-#	@ $(PYLINT) --rcfile=.pylintrc yices.py test/*.py
-
 lint_all: check_lint
 # for detecting more than just errors:
-	@ $(PYLINT) --rcfile=../.pylintrc *.py
+	@ $(PYLINT) --rcfile=.pylintrc *.py
 
 .PHONY: lint check_lint

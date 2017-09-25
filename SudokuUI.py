@@ -10,7 +10,7 @@
 # All changes are recorded in the git commits.
 #
 
-from Tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, BOTTOM
+from Tkinter import Canvas, Frame, Button, BOTH, TOP, BOTTOM
 
 from Constants import WIDTH, HEIGHT, MARGIN, SIDE
 
@@ -110,7 +110,7 @@ class SudokuUI(Frame):
         if self.game.game_over:
             return
         x, y = event.x, event.y
-        if (MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN):
+        if MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN:
             self.canvas.focus_set()
 
             # get row and col numbers from x,y coordinates

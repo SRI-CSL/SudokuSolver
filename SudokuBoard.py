@@ -10,6 +10,9 @@
 # All changes are recorded in the git commits.
 #
 
+from SudokuError import SudokuError
+
+
 class SudokuBoard(object):
     """
     Sudoku Board representation
@@ -27,12 +30,12 @@ class SudokuBoard(object):
                 )
             board.append([])
 
-            for c in line:
-                if not c.isdigit():
+            for char in line:
+                if not char.isdigit():
                     raise SudokuError(
                         "Valid characters for a sudoku puzzle must be in 0-9"
                     )
-                board[-1].append(int(c))
+                board[-1].append(int(char))
 
         if len(board) != 9:
             raise SudokuError("Each sudoku puzzle must be 9 lines long")

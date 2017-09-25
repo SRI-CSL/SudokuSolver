@@ -21,10 +21,10 @@ class SudokuGame(object):
     def __init__(self, board_file):
         self.board_file = board_file
         self.start_puzzle = SudokuBoard(board_file).board
-
-    def start(self):
         self.game_over = False
         self.puzzle = []
+
+    def start(self):
         for i in xrange(9):
             self.puzzle.append([])
             for j in xrange(9):

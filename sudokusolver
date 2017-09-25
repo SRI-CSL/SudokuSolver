@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
             root = Tk()
             SudokuUI(root, game)
-            root.geometry("%dx%d" % (WIDTH, HEIGHT + 40))
+            root.geometry("{0}x{1}".format(WIDTH, HEIGHT + 40))
             root.mainloop()
 
     except KeyboardInterrupt:
