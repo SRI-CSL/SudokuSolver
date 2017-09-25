@@ -1,3 +1,6 @@
+
+from ctypes import c_int32
+
 #this way is a bit long winded
 from yices import (yices_init,
                    yices_exit,
@@ -18,15 +21,12 @@ from yices import (yices_init,
                    get_model,
                    get_int32_value,
                    free_context,
-                   free_config
-)
+                   free_config)
 
 
 #this way we could use the yices_ prefixes everywhere and feel safe.
 #from yices import *
 
-
-from ctypes import ( c_int32 )
 
 
 #probably things like this need to be moved into yices.py
@@ -60,11 +60,16 @@ class SudokuSolver(object):
     def __init__(self, game):
         self.game = game
         yices_init()
+        # the matrix of uninterpreted term
         self.logic = self.__createLogic()
+        # the numerals as yices constants
         self.numerals = self.__createNumerals()
+        # the yices configuration for puzzle solving
         self.config = new_config()
         default_config_for_logic(self.config, "QF_LIA")
+        # the context (a set of yices assertions)
         self.context = new_context(self.config)
+        # add the generic constraints (corresponding to the rules of the game)
         self.__generateConstraints()
 
 
@@ -80,7 +85,7 @@ class SudokuSolver(object):
         logic = [None] * 9
         for i in xrange(9):
             logic[i] = [None] * 9
-            for j in range(9):
+            for j in xrange(9):
                 logic[i][j] = new_uninterpreted_term(int_t)
         return logic
 
@@ -125,12 +130,11 @@ class SudokuSolver(object):
 
 
     def __addFacts(self):
-        def set_value(context, position, value):
-            (row, column) = position
-            assert 1 <= row and row <= 9
-            assert 1 <= column and column <= 9
+        def set_value(row, column, value):
+            assert 0 <= row and row < 9
+            assert 0 <= column and column < 9
             assert 1 <= value and value <= 9
-            assert_formula(self.context, arith_eq_atom(self.logic[row - 1][column - 1], self.numerals[value]))
+            assert_formula(self.context, arith_eq_atom(self.logic[row][column], self.numerals[value]))
 
 
         for i in xrange(9):
