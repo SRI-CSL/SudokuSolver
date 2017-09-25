@@ -140,11 +140,14 @@ class SudokuSolver(object):
         for i in xrange(9):
             for j in xrange(9):
                 value = self.game.puzzle[i][j]
-                if value is not None:
-                    set_value(self.context, (i, j), value)
+                if value != 0:
+                    set_value(i, j, value)
 
 
     def solve(self):
+
+        self.__addFacts()
+
         smt_stat = check_context(self.context, None)
 
         if smt_stat != 3:

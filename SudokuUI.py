@@ -10,7 +10,7 @@
 # All changes are recorded in the git commits.
 #
 
-from Tkinter import Canvas, Frame, Button, BOTH, TOP, BOTTOM
+from Tkinter import Canvas, Frame, Button, BOTH, TOP, BOTTOM, LEFT, RIGHT
 
 from Constants import WIDTH, HEIGHT, MARGIN, SIDE
 
@@ -34,10 +34,16 @@ class SudokuUI(Frame):
                              width=WIDTH,
                              height=HEIGHT)
         self.canvas.pack(fill=BOTH, side=TOP)
+
         clear_button = Button(self,
                               text="Clear answers",
                               command=self.__clear_answers)
-        clear_button.pack(fill=BOTH, side=BOTTOM)
+        clear_button.pack(side=LEFT)
+
+        solve_button = Button(self,
+                              text="Solve",
+                              command=self.__solve_puzzle)
+        solve_button.pack(side=RIGHT)
 
         self.__draw_grid()
         self.__draw_puzzle()
@@ -119,7 +125,9 @@ class SudokuUI(Frame):
             # if cell was selected already - deselect it
             if (row, col) == (self.row, self.col):
                 self.row, self.col = -1, -1
-            elif self.game.puzzle[row][col] == 0:
+            #iam: the elif choice makes an entry permanent, not sure why they chose that route.
+            #elif self.game.puzzle[row][col] == 0:
+            else:
                 self.row, self.col = row, col
         else:
             self.row, self.col = -1, -1
@@ -140,4 +148,8 @@ class SudokuUI(Frame):
     def __clear_answers(self):
         self.game.start()
         self.canvas.delete("victory")
+        self.__draw_puzzle()
+
+    def __solve_puzzle(self):
+        self.game.solve()
         self.__draw_puzzle()

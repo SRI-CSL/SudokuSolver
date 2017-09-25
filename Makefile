@@ -8,6 +8,7 @@ help:
 	@echo 'Here are the targets:'
 	@echo ''
 	@echo 'To run debug           :    "make debug"'
+	@echo 'To run n00b            :    "make n00b"'
 	@echo 'To run l33t            :    "make l33t"'
 	@echo 'To run error           :    "make error"'
 	@echo 'To pylint (errors)     :    "make lint"'
@@ -16,6 +17,9 @@ help:
 
 debug:
 	./sudokusolver --board debug
+
+n00b:
+	./sudokusolver --board n00b
 
 l33t:
 	./sudokusolver --board l33t

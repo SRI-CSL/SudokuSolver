@@ -10,7 +10,11 @@
 # All changes are recorded in the git commits.
 #
 
+import sys
+
+
 from SudokuBoard import SudokuBoard
+from SudokuSolver import SudokuSolver
 
 
 class SudokuGame(object):
@@ -23,12 +27,21 @@ class SudokuGame(object):
         self.start_puzzle = SudokuBoard(board_file).board
         self.game_over = False
         self.puzzle = []
+        self.solver = SudokuSolver(self)
 
     def start(self):
+        self.game_over = False
+        self.puzzle = []
         for i in xrange(9):
             self.puzzle.append([])
             for j in xrange(9):
                 self.puzzle[i].append(self.start_puzzle[i][j])
+
+    def solve(self):
+        self.solver.solve()
+        sys.stderr.write('Boo!\n')
+
+
 
     def check_win(self):
         for row in xrange(9):
