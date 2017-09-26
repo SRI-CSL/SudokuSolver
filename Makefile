@@ -7,6 +7,7 @@ help:
 	@echo ''
 	@echo 'Here are the targets:'
 	@echo ''
+	@echo 'To start from scratch  :    "make empty"'
 	@echo 'To run debug           :    "make debug"'
 	@echo 'To run n00b            :    "make n00b"'
 	@echo 'To run l33t            :    "make l33t"'
@@ -14,6 +15,9 @@ help:
 	@echo 'To pylint (errors)     :    "make lint"'
 	@echo 'To pylint (all)        :    "make lint_all"'
 	@echo ''
+
+empty:
+	./sudokusolver
 
 debug:
 	./sudokusolver --board debug
