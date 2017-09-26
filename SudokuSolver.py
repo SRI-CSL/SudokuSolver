@@ -64,15 +64,15 @@ class SudokuSolver(object):
     def __init__(self, game):
         self.game = game
         yices_init()
-        # the matrix of uninterpreted term
+        # the matrix of uninterpreted terms
         self.variables = self.__createVariables()
         # the numerals as yices constants
         self.numerals = self.__createNumerals()
         # the yices configuration for puzzle solving
         self.config = new_config()
-        # is push and pop the default
+        # is push and pop the default (yes; had to look at the source though.)
         default_config_for_logic(self.config, "QF_LIA")
-        # the context (a set of yices assertions)
+        # the context (a set/stack of yices assertions)
         self.context = new_context(self.config)
         # add the generic constraints (corresponding to the rules of the game)
         self.__generateConstraints()
@@ -87,9 +87,8 @@ class SudokuSolver(object):
     def __createVariables(self):
         """Creates the matrix of uninterpreted terms that represents the logical view of the board."""
         int_t = int_type()
-        variables = [None] * 9
+        variables = SudokuBoard.newBoard()
         for i in xrange(9):
-            variables[i] = [None] * 9
             for j in xrange(9):
                 variables[i][j] = new_uninterpreted_term(int_t)
         return variables
@@ -135,6 +134,7 @@ class SudokuSolver(object):
 
 
     def __addFacts(self):
+        """Adds the facts gleaned from the current state of the puzzle."""
         def set_value(row, column, value):
             assert 0 <= row and row < 9
             assert 0 <= column and column < 9
@@ -153,6 +153,7 @@ class SudokuSolver(object):
         """Attempts to solve the puzzle, returning either None if there is no solution, or a board with the correct MISSING entries."""
         solution = None
 
+        #we use push and pop so that we can solve (variants) repeatedly without having to start from scratch each time.
         push(self.context)
 
         self.__addFacts()
@@ -166,13 +167,14 @@ class SudokuSolver(object):
             model = get_model(self.context, 1)
             val = c_int32()
 
+            #return the model as a board with ONLY the newly found values inserted.
             solution = SudokuBoard.newBoard()
 
             for i in xrange(9):
                 for j in xrange(9):
                     if self.game.puzzle[i][j] == 0:
                         get_int32_value(model, self.variables[i][j], val)
-                        print 'V({0}, {1}) = {2}'.format(i, j, val.value)
+                        #print 'V({0}, {1}) = {2}'.format(i, j, val.value)
                         solution[i][j] = val.value
 
             free_model(model)
