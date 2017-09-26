@@ -26,7 +26,7 @@ from SudokuUI import SudokuUI
 def parse_arguments():
     """
     Parses arguments of the form:
-        sudoku.py <board name>
+        sudokusolver --board <board name>
     Where `board name` must be in the `BOARD` list
     """
     arg_parser = argparse.ArgumentParser()
