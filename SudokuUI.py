@@ -35,15 +35,20 @@ class SudokuUI(Frame):
                              height=HEIGHT)
         self.canvas.pack(fill=BOTH, side=TOP)
 
-        clear_button = Button(self,
-                              text="Clear answers",
-                              command=self.__clear_answers)
-        clear_button.pack(side=LEFT)
+        clear_puzzle_button = Button(self,
+                              text="Clear Puzzle",
+                              command=self.__clear_puzzle)
+        clear_puzzle_button.pack(side=LEFT, padx=MARGIN)
+
+        clear_solution_button = Button(self,
+                              text="Clear Solution",
+                              command=self.__clear_solution)
+        clear_solution_button.pack(side=LEFT, padx=MARGIN)
 
         solve_button = Button(self,
                               text="Solve",
                               command=self.__solve_puzzle)
-        solve_button.pack(side=RIGHT)
+        solve_button.pack(side=LEFT, padx=MARGIN)
 
         self.__draw_grid()
         self.__draw_puzzle()
@@ -121,6 +126,22 @@ class SudokuUI(Frame):
             fill="white", font=("Arial", 32)
         )
 
+    def __draw_no_solution(self):
+        # create a oval (which will be a circle)
+        x0 = y0 = MARGIN + SIDE * 2
+        x1 = y1 = MARGIN + SIDE * 7
+        self.canvas.create_oval(
+            x0, y0, x1, y1,
+            tags="failure", fill="dark red", outline="red"
+        )
+        # create text
+        x = y = MARGIN + 4 * SIDE + SIDE / 2
+        self.canvas.create_text(
+            x, y,
+            text="No Solution!", tags="failure",
+            fill="white", font=("Arial", 32)
+        )
+
     def __cell_clicked(self, event):
         if self.game.game_over:
             return
@@ -154,11 +175,18 @@ class SudokuUI(Frame):
             if self.game.check_win():
                 self.__draw_victory()
 
-    def __clear_answers(self):
+    def __clear_puzzle(self):
         self.game.start()
         self.canvas.delete("victory")
+        self.canvas.delete("failure")
+        self.__draw_puzzle()
+
+    def __clear_solution(self):
+        self.canvas.delete("failure")
+        self.game.clear_solution()
         self.__draw_puzzle()
 
     def __solve_puzzle(self):
-        self.game.solve()
+        if not self.game.solve():
+            self.__draw_no_solution()
         self.__draw_puzzle()

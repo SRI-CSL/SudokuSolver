@@ -34,16 +34,19 @@ class SudokuGame(object):
 
     def start(self):
         self.game_over = False
-        self.puzzle = []
+        self.puzzle = SudokuBoard.newBoard()
         self.solution = None
         for i in xrange(9):
-            self.puzzle.append([])
             for j in xrange(9):
-                self.puzzle[i].append(self.start_puzzle[i][j])
+                self.puzzle[i][j] = self.start_puzzle[i][j]
 
     def solve(self):
         self.solution = self.solver.solve()
+        return True if self.solution else False
 
+
+    def clear_solution(self):
+        self.solution = None
 
 
     def check_win(self):
