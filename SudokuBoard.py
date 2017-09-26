@@ -13,32 +13,56 @@
 from SudokuError import SudokuError
 
 
+
 class SudokuBoard(object):
     """
     Sudoku Board representation
 
-    iam: not really sure why we need this intermediate
-    representation.
     """
-    def __init__(self, board_file):
-        self.board = self.__create_board(board_file)
 
-    def __create_board(self, board_file):
-        board = []
-        for line in board_file:
+    @staticmethod
+    def newBoard():
+        """Creates an empty board, with all entries being 0."""
+        board = [0] * 9
+        for i in xrange(9):
+            board[i] = [0] * 9
+        return board
+
+
+
+    def __init__(self, board_fp):
+        self.board = self.__create_board(board_fp)
+
+
+    def __create_board(self, board_fp):
+
+        board = SudokuBoard.newBoard()
+
+        if board_fp is None:
+            return board
+
+        row = 0
+        column = 0
+
+        for line in board_fp:
             line = line.strip()
             if len(line) != 9:
                 raise SudokuError(
                     "Each line in the sudoku puzzle must be 9 chars long."
                 )
-            board.append([])
 
             for char in line:
                 if not char.isdigit():
                     raise SudokuError(
                         "Valid characters for a sudoku puzzle must be in 0-9"
                     )
-                board[-1].append(int(char))
+                board[row][column] = int(char)
+                column += 1
+            row += 1
+            column = 0
+
+            if row == 9:
+                break
 
         if len(board) != 9:
             raise SudokuError("Each sudoku puzzle must be 9 lines long")

@@ -22,11 +22,11 @@ class SudokuGame(object):
     A Sudoku game, in charge of storing the state of the board and checking
     whether the puzzle is completed.
     """
-    def __init__(self, board_file):
-        self.board_file = board_file
-        self.start_puzzle = SudokuBoard(board_file).board
+    def __init__(self, board_fp):
+        self.board_fp = board_fp
+        self.start_puzzle = SudokuBoard(board_fp).board
         self.game_over = False
-        self.puzzle = []
+        self.puzzle = None
         self.solver = SudokuSolver(self)
 
     def start(self):
@@ -39,7 +39,6 @@ class SudokuGame(object):
 
     def solve(self):
         self.solver.solve()
-        sys.stderr.write('Boo!\n')
 
 
 

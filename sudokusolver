@@ -34,7 +34,7 @@ def parse_arguments():
                             help="Desired board name",
                             type=str,
                             choices=BOARDS,
-                            required=True)
+                            required=False)
 
     # Creates a dictionary of keys = argument flag, and value = argument
     args = vars(arg_parser.parse_args())
@@ -48,14 +48,22 @@ if __name__ == '__main__':
 
         board_name = parse_arguments()
 
-        with open('data/%s.sudoku' % board_name, 'r') as boards_file:
-            game = SudokuGame(boards_file)
-            game.start()
+        if board_name is not None:
+            board_fp = open('data/%s.sudoku' % board_name, 'r')
+        else:
+            board_fp = None
 
-            root = Tk()
-            SudokuUI(root, game)
-            root.geometry("{0}x{1}".format(WIDTH, HEIGHT + 40))
-            root.mainloop()
+        game = SudokuGame(board_fp)
+        game.start()
+
+        root = Tk()
+        SudokuUI(root, game)
+        root.geometry("{0}x{1}".format(WIDTH, HEIGHT + 40))
+        root.mainloop()
+
+        if board_fp is not None:
+            board_fp.close()
+
 
     except KeyboardInterrupt:
         sys.exit(0)

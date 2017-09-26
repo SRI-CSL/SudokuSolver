@@ -18,7 +18,10 @@ from yices import (yices_init,
                    default_config_for_logic,
                    assert_formula,
                    check_context,
+                   push,
+                   pop,
                    get_model,
+                   free_model,
                    get_int32_value,
                    free_context,
                    free_config)
@@ -61,11 +64,12 @@ class SudokuSolver(object):
         self.game = game
         yices_init()
         # the matrix of uninterpreted term
-        self.logic = self.__createLogic()
+        self.variables = self.__createVariables()
         # the numerals as yices constants
         self.numerals = self.__createNumerals()
         # the yices configuration for puzzle solving
         self.config = new_config()
+        # is push and pop the default
         default_config_for_logic(self.config, "QF_LIA")
         # the context (a set of yices assertions)
         self.context = new_context(self.config)
@@ -79,15 +83,15 @@ class SudokuSolver(object):
         yices_exit()
 
 
-    def __createLogic(self):
+    def __createVariables(self):
         """Creates the matrix of uninterpreted terms that represents the logical view of the board."""
         int_t = int_type()
-        logic = [None] * 9
+        variables = [None] * 9
         for i in xrange(9):
-            logic[i] = [None] * 9
+            variables[i] = [None] * 9
             for j in xrange(9):
-                logic[i][j] = new_uninterpreted_term(int_t)
-        return logic
+                variables[i][j] = new_uninterpreted_term(int_t)
+        return variables
 
     def __createNumerals(self):
         numerals = {}
@@ -106,7 +110,7 @@ class SudokuSolver(object):
             return and2(arith_leq_atom(one, x), arith_leq_atom(x, nine))
         for i in xrange(9):
             for j in xrange(9):
-                assert_formula(self.context, between_1_and_9(self.logic[i][j]))
+                assert_formula(self.context, between_1_and_9(self.variables[i][j]))
 
         # all elements of the array x are distinct
         def all_distinct(x):
@@ -116,17 +120,17 @@ class SudokuSolver(object):
 
         # All elements in a row must be distinct
         for i in xrange(9):
-            assert_formula(self.context, all_distinct([self.logic[i][j] for j in xrange(9)]))  #I.e.  all_distinct(X[i])
+            assert_formula(self.context, all_distinct([self.variables[i][j] for j in xrange(9)]))  #I.e.  all_distinct(X[i])
 
 
         # All elements in a column must be distinct
         for i in xrange(9):
-            assert_formula(self.context, all_distinct([self.logic[j][i] for j in xrange(9)]))
+            assert_formula(self.context, all_distinct([self.variables[j][i] for j in xrange(9)]))
 
         # All elements in each 3x3 square must be distinct
         for k in xrange(3):
             for l in xrange(3):
-                assert_formula(self.context, all_distinct([self.logic[i + 3 * l][j + 3 * k] for i in xrange(3) for j in xrange(3)]))
+                assert_formula(self.context, all_distinct([self.variables[i + 3 * l][j + 3 * k] for i in xrange(3) for j in xrange(3)]))
 
 
     def __addFacts(self):
@@ -134,7 +138,7 @@ class SudokuSolver(object):
             assert 0 <= row and row < 9
             assert 0 <= column and column < 9
             assert 1 <= value and value <= 9
-            assert_formula(self.context, arith_eq_atom(self.logic[row][column], self.numerals[value]))
+            assert_formula(self.context, arith_eq_atom(self.variables[row][column], self.numerals[value]))
 
 
         for i in xrange(9):
@@ -146,6 +150,8 @@ class SudokuSolver(object):
 
     def solve(self):
 
+        push(self.context)
+        print 'Pushing\n'
         self.__addFacts()
 
         smt_stat = check_context(self.context, None)
@@ -158,5 +164,9 @@ class SudokuSolver(object):
             val = c_int32()
             for i in xrange(9):
                 for j in xrange(9):
-                    get_int32_value(model, self.logic[i][j], val)
+                    get_int32_value(model, self.variables[i][j], val)
                     print 'V({0}, {1}) = {2}'.format(i, j, val.value)
+            free_model(model)
+
+        pop(self.context)
+        print 'Popping\n'
