@@ -30,6 +30,7 @@ from yices import (yices_init,
 #this way we could use the yices_ prefixes everywhere and feel safe.
 #from yices import *
 
+from SudokuBoard import SudokuBoard
 
 
 #probably things like this need to be moved into yices.py
@@ -149,9 +150,11 @@ class SudokuSolver(object):
 
 
     def solve(self):
+        """Attempts to solve the puzzle, returning either None if there is no solution, or a board with the correct MISSING entries."""
+        solution = None
 
         push(self.context)
-        print 'Pushing\n'
+
         self.__addFacts()
 
         smt_stat = check_context(self.context, None)
@@ -162,11 +165,18 @@ class SudokuSolver(object):
             #print model
             model = get_model(self.context, 1)
             val = c_int32()
+
+            solution = SudokuBoard.newBoard()
+
             for i in xrange(9):
                 for j in xrange(9):
-                    get_int32_value(model, self.variables[i][j], val)
-                    print 'V({0}, {1}) = {2}'.format(i, j, val.value)
+                    if self.game.puzzle[i][j] == 0:
+                        get_int32_value(model, self.variables[i][j], val)
+                        print 'V({0}, {1}) = {2}'.format(i, j, val.value)
+                        solution[i][j] = val.value
+
             free_model(model)
 
         pop(self.context)
-        print 'Popping\n'
+
+        return solution

@@ -26,19 +26,23 @@ class SudokuGame(object):
         self.board_fp = board_fp
         self.start_puzzle = SudokuBoard(board_fp).board
         self.game_over = False
+        # puzzle extends start_puzzle
         self.puzzle = None
+        # the non-0 entries in solution are 0 in puzzle
+        self.solution = None
         self.solver = SudokuSolver(self)
 
     def start(self):
         self.game_over = False
         self.puzzle = []
+        self.solution = None
         for i in xrange(9):
             self.puzzle.append([])
             for j in xrange(9):
                 self.puzzle[i].append(self.start_puzzle[i][j])
 
     def solve(self):
-        self.solver.solve()
+        self.solution = self.solver.solve()
 
 
 

@@ -83,6 +83,15 @@ class SudokuUI(Frame):
                     self.canvas.create_text(
                         x, y, text=answer, tags="numbers", fill=color
                     )
+                elif self.game.solution is not None:
+                    solution = self.game.solution[i][j]
+                    if solution != 0:
+                        x = MARGIN + j * SIDE + SIDE / 2
+                        y = MARGIN + i * SIDE + SIDE / 2
+                        self.canvas.create_text(
+                            x, y, text=solution, tags="numbers", fill="purple"
+                        )
+
 
     def __draw_cursor(self):
         self.canvas.delete("cursor")
