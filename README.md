@@ -28,6 +28,9 @@ can clear the entries too.  There are a couple of built in boards, so you can st
 add a few entries and then solve. Seems like the `l33t` board has 158 solutions, which I think means it is not a
 legal puzzle.
 
+I think legal sudoku puzzles should have unique solutions.
+If you try and solve a puzzle that has many solutions you may be in for a long wait.
+
 You can also ask for the number of solutions, but be careful, if there are a lot (i.e. the puzzle in near to empty)
 then this will take time (might want to bail if the number of solutions is larger than a K?).
 
