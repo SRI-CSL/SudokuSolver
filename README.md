@@ -16,14 +16,14 @@ pip install yices
 
 So not a lot of brain power was spent making this a watertight work. But if you start of with an empty board
 ```
-make empty
+./sudokusolver
 ```
 you can add entries one by one, and then solve. Clear the solution and continue to add entries. Or if you wish you
 can clear the entries too.  There are a couple of built in boards, so you can start from one like so:
 ```
-make debug
-make n00b
-make l33t
+./sudokusolver --board debug
+./sudokusolver --board n00b
+./sudokusolver --board l33t
 ```
 add a few entries and then solve. Seems like the `l33t` board has 158 solutions, which I think means it is not a
 legal puzzle.
