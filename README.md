@@ -29,7 +29,7 @@ add a few entries and then solve. Seems like the `l33t` board has 158 solutions,
 legal puzzle.
 
 You can also ask for the number of solutions, but be careful, if there are a lot (i.e. the puzzle in near to empty)
-then this will take time.
+then this will take time (might want to bail if the number of solutions is larger than a K?).
 
 ## Acknowledgments
 
