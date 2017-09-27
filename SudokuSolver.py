@@ -136,6 +136,9 @@ class SudokuSolver(object):
 
 
     def solve(self):
+
+        print 'The number of solutions is {0}'.format(self.countModels())
+
         """Attempts to solve the puzzle, returning either None if there is no solution, or a board with the correct MISSING entries."""
         solution = None
 
@@ -168,3 +171,36 @@ class SudokuSolver(object):
         yices_pop(self.context)
 
         return solution
+
+    #we could contrast the following with the  yices_assert_blocking_clause
+
+    def countModels(self):
+
+        def model2term(model):
+            termlist = []
+            val = c_int32()
+            for i in xrange(9):
+                for j in xrange(9):
+                    if self.game.puzzle[i][j] == 0:
+                        yices_get_int32_value(model, self.variables[i][j], val)
+                        var = self.variables[i][j]
+                        value = self.numerals[val.value]
+                        termlist.append(yices_arith_eq_atom(var, value))
+            return yices_and(len(termlist), make_term_array(termlist))
+
+        result = 0
+
+        yices_push(self.context)
+
+        self.__addFacts()
+
+        while  yices_check_context(self.context, None) == 3:
+            model = yices_get_model(self.context, 1)
+            diagram = model2term(model)
+            yices_assert_formula(self.context, yices_not(diagram))
+            yices_free_model(model)
+            result += 1
+
+        yices_pop(self.context)
+
+        return result

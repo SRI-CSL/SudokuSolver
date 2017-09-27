@@ -44,6 +44,8 @@ class SudokuGame(object):
         self.solution = self.solver.solve()
         return True if self.solution else False
 
+    def countSolutions(self):
+        return self.solver.countModels()
 
     def clear_solution(self):
         self.solution = None

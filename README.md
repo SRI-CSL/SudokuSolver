@@ -21,9 +21,15 @@ make empty
 you can add entries one by one, and then solve. Clear the solution and continue to add entries. Or if you wish you
 can clear the entries too.  There are a couple of built in boards, so you can start from one like so:
 ```
+make debug
+make n00b
 make l33t
 ```
-add a few entries and then solve. Seems like this board has multiple solutions.
+add a few entries and then solve. Seems like the `l33t` board has 158 solutions, which I think means it is not a
+legal puzzle.
+
+You can also ask for the number of solutions, but be careful, if there are a lot (i.e. the puzzle in near to empty)
+then this will take time.
 
 ## Acknowledgments
 

@@ -17,6 +17,9 @@ BOARDS = ['debug', 'n00b', 'l33t', 'error']
 # Pixels around the board
 MARGIN = 20
 
+# Pixels between buttons
+PAD = 10
+
 # Width of every board cell.
 SIDE = 50
 

@@ -12,7 +12,7 @@
 
 from Tkinter import Canvas, Frame, Button, BOTH, TOP, BOTTOM, LEFT, RIGHT
 
-from Constants import WIDTH, HEIGHT, MARGIN, SIDE
+from Constants import WIDTH, HEIGHT, MARGIN, SIDE, PAD
 
 class SudokuUI(Frame):
     """
@@ -38,17 +38,22 @@ class SudokuUI(Frame):
         clear_puzzle_button = Button(self,
                               text="Clear Puzzle",
                               command=self.__clear_puzzle)
-        clear_puzzle_button.pack(side=LEFT, padx=MARGIN)
+        clear_puzzle_button.pack(side=LEFT, padx=PAD)
 
         clear_solution_button = Button(self,
                               text="Clear Solution",
                               command=self.__clear_solution)
-        clear_solution_button.pack(side=LEFT, padx=MARGIN)
+        clear_solution_button.pack(side=LEFT, padx=PAD)
 
         solve_button = Button(self,
                               text="Solve",
                               command=self.__solve_puzzle)
-        solve_button.pack(side=LEFT, padx=MARGIN)
+        solve_button.pack(side=LEFT, padx=PAD)
+
+        count_button = Button(self,
+                              text="Count Solutions",
+                              command=self.__count_solutions)
+        count_button.pack(side=LEFT, padx=PAD)
 
         self.__draw_grid()
         self.__draw_puzzle()
@@ -110,37 +115,41 @@ class SudokuUI(Frame):
                 outline="red", tags="cursor"
             )
 
-    def __draw_victory(self):
+    def __drawMessage(self, tag, textstr, fillc, outlinec):
         # create a oval (which will be a circle)
         x0 = y0 = MARGIN + SIDE * 2
         x1 = y1 = MARGIN + SIDE * 7
         self.canvas.create_oval(
             x0, y0, x1, y1,
-            tags="victory", fill="dark orange", outline="orange"
+            tags=tag, fill=fillc, outline=outlinec
         )
         # create text
         x = y = MARGIN + 4 * SIDE + SIDE / 2
         self.canvas.create_text(
             x, y,
-            text="You win!", tags="victory",
+            text=textstr, tags=tag,
             fill="white", font=("Arial", 32)
         )
 
+
+    def __draw_victory(self):
+        self.__drawMessage("victory", "You win!", "dark orange", "orange")
+
+
     def __draw_no_solution(self):
-        # create a oval (which will be a circle)
-        x0 = y0 = MARGIN + SIDE * 2
-        x1 = y1 = MARGIN + SIDE * 7
-        self.canvas.create_oval(
-            x0, y0, x1, y1,
-            tags="failure", fill="dark red", outline="red"
-        )
-        # create text
-        x = y = MARGIN + 4 * SIDE + SIDE / 2
-        self.canvas.create_text(
-            x, y,
-            text="No Solution!", tags="failure",
-            fill="white", font=("Arial", 32)
-        )
+        self.__drawMessage("failure", "No Solution!", "dark red", "red")
+
+    def __draw_solution_count(self):
+        count = self.game.countSolutions()
+        if count == 0:
+            text = "No solutions."
+        elif count == 1:
+            text = "Unique solution."
+        else:
+            text = "{0} solutions".format(count)
+
+        self.__drawMessage("count", text, "dark green", "green")
+
 
     def __cell_clicked(self, event):
         if self.game.game_over:
@@ -175,18 +184,25 @@ class SudokuUI(Frame):
             if self.game.check_win():
                 self.__draw_victory()
 
+    def __clear_messages(self):
+        for tag in ["victory", "failure", "count"]:
+            self.canvas.delete(tag)
+
     def __clear_puzzle(self):
         self.game.start()
-        self.canvas.delete("victory")
-        self.canvas.delete("failure")
+        self.__clear_messages()
         self.__draw_puzzle()
 
     def __clear_solution(self):
-        self.canvas.delete("failure")
+        self.__clear_messages()
         self.game.clear_solution()
         self.__draw_puzzle()
 
     def __solve_puzzle(self):
         if not self.game.solve():
             self.__draw_no_solution()
+        self.__draw_puzzle()
+
+    def __count_solutions(self):
+        self.__draw_solution_count()
         self.__draw_puzzle()
