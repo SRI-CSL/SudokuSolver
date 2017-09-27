@@ -56,6 +56,8 @@ class SudokuBoard(object):
                     raise SudokuError(
                         "Valid characters for a sudoku puzzle must be in 0-9"
                     )
+                #not sure why pylint gets confused here; it doesn't complain about
+                #the same idiom in bug.py
                 board[row][column] = int(char)
                 column += 1
             row += 1

@@ -11,8 +11,6 @@ You will also need the python bindings:
 ```
 pip install yices
 ```
-The bindings are not yet set in stone, since I am very indecisive about these sorts of things, so there could be
-minor mismatches in the naming conventions used.
 
 ## Usage
 
@@ -30,5 +28,5 @@ add a few entries and then solve. Seems like this board has multiple solutions.
 ## Acknowledgments
 
 This project was built on top of the nice python [tutorial](http://newcoder.io/gui/) by [Lynn Root](http://www.roguelynn.com/)
-who is hereby thanked. The tutorial is under the creative commons [license](https://creativecommons.org/licenses/by-sa/3.0/deed.en_US) which does 
+who is hereby thanked. The tutorial is under the creative commons [license](https://creativecommons.org/licenses/by-sa/3.0/deed.en_US) which does
 not appear to be an option in GitHub's license widget, so if this is a problem let me know.
