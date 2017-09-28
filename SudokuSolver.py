@@ -1,36 +1,6 @@
 
 from ctypes import c_int32
 
-"""
-#this way is a bit long winded
-from yices import (yices_init,
-                   yices_exit,
-                   yices_int_type,
-                   yices_int32,
-                   term_t,
-                   type_t,
-                   make_term_array,
-                   make_type_array,
-                   yices_distinct,
-                   yices_and2,
-                   yices_arith_eq_atom,
-                   yices_arith_leq_atom,
-                   yices_new_uninterpreted_term,
-                   yices_new_config,
-                   yices_new_context,
-                   yices_default_config_for_logic,
-                   yices_assert_formula,
-                   yices_check_context,
-                   yices_push,
-                   yices_pop,
-                   yices_get_model,
-                   yices_free_model,
-                   yices_get_int32_value,
-                   yices_free_context,
-                   yices_free_config)
-"""
-
-#this way we could use the yices_ prefixes everywhere and feel safe.
 from yices import *
 
 from SudokuBoard import SudokuBoard
@@ -106,7 +76,7 @@ class SudokuSolver(object):
 
         # All elements in a row must be distinct
         for i in xrange(9):
-            yices_assert_formula(self.context, all_distinct([self.variables[i][j] for j in xrange(9)]))  #I.e.  all_distinct(X[i])
+            yices_assert_formula(self.context, all_distinct([self.variables[i][j] for j in xrange(9)]))
 
 
         # All elements in a column must be distinct
@@ -137,8 +107,6 @@ class SudokuSolver(object):
 
     def solve(self):
 
-        print 'The number of solutions is {0}'.format(self.countModels())
-
         """Attempts to solve the puzzle, returning either None if there is no solution, or a board with the correct MISSING entries."""
         solution = None
 
@@ -149,10 +117,10 @@ class SudokuSolver(object):
 
         smt_stat = yices_check_context(self.context, None)
 
-        if smt_stat != 3:
+        if smt_stat != STATUS_SAT:
             print 'No solution: smt_stat = {0}\n'.format(smt_stat)
         else:
-            #print model
+            #get the model
             model = yices_get_model(self.context, 1)
             val = c_int32()
 
@@ -194,7 +162,7 @@ class SudokuSolver(object):
 
         self.__addFacts()
 
-        while  yices_check_context(self.context, None) == 3:
+        while  yices_check_context(self.context, None) == STATUS_SAT:
             model = yices_get_model(self.context, 1)
             diagram = model2term(model)
             yices_assert_formula(self.context, yices_not(diagram))
