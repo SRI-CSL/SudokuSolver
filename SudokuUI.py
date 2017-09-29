@@ -12,7 +12,7 @@
 
 from Tkinter import Canvas, Frame, Button, BOTH, TOP, BOTTOM, LEFT, RIGHT
 
-from Constants import WIDTH, HEIGHT, MARGIN, SIDE, PAD
+from Constants import WIDTH, HEIGHT, MARGIN, SIDE, PAD, ALEPH_NOUGHT
 
 class SudokuUI(Frame):
     """
@@ -145,8 +145,10 @@ class SudokuUI(Frame):
             text = "No solutions."
         elif count == 1:
             text = "Unique solution."
-        else:
+        elif count < ALEPH_NOUGHT:
             text = "{0} solutions".format(count)
+        else:
+            text = ">= {0} solutions".format(count)
 
         self.__drawMessage("count", text, "dark green", "green")
 
@@ -164,7 +166,7 @@ class SudokuUI(Frame):
             # if cell was selected already - deselect it
             if (row, col) == (self.row, self.col):
                 self.row, self.col = -1, -1
-            #iam: the elif choice makes an entry permanent, not sure why they chose that route.
+            #iam: the elif choice makes an entry permanent, not sure why Lynn Root chose that route.
             #elif self.game.puzzle[row][col] == 0:
             else:
                 self.row, self.col = row, col

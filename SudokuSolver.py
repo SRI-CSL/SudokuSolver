@@ -5,6 +5,7 @@ from yices import *
 
 from SudokuBoard import SudokuBoard
 
+from Constants import ALEPH_NOUGHT
 
 class SudokuSolver(object):
 
@@ -49,7 +50,7 @@ class SudokuSolver(object):
         return variables
 
     def __createNumerals(self):
-        """Creates a mappimng from digits to yices constants for those digits."""
+        """Creates a mapping from digits to yices constants for those digits."""
         numerals = {}
         for i in xrange(1, 10):
             numerals[i] = yices_int32(i)
@@ -57,17 +58,12 @@ class SudokuSolver(object):
 
 
     def __generateConstraints(self):
-        one = self.numerals[1]
-        nine = self.numerals[9]
-
-
         # each x is between 1 and 9
         def between_1_and_9(x):
             t = make_empty_term_array(9);
             for i in xrange(9):
                 t[i] = yices_eq(x, self.numerals[i+1])
             return yices_or(9, t)
-###            return yices_and2(yices_arith_leq_atom(one, x), yices_arith_leq_atom(x, nine))
         for i in xrange(9):
             for j in xrange(9):
                 yices_assert_formula(self.context, between_1_and_9(self.variables[i][j]))
@@ -172,6 +168,8 @@ class SudokuSolver(object):
             yices_assert_formula(self.context, yices_not(diagram))
             yices_free_model(model)
             result += 1
+            if result == ALEPH_NOUGHT:
+                break
 
         yices_pop(self.context)
 

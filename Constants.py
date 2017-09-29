@@ -25,3 +25,7 @@ SIDE = 50
 
 # Width and height of the whole board
 WIDTH = HEIGHT = MARGIN * 2 + SIDE * 9
+
+
+# Don't count more than these number of models
+ALEPH_NOUGHT = 64
