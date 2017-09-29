@@ -63,7 +63,11 @@ class SudokuSolver(object):
 
         # each x is between 1 and 9
         def between_1_and_9(x):
-            return yices_and2(yices_arith_leq_atom(one, x), yices_arith_leq_atom(x, nine))
+            t = make_empty_term_array(9);
+            for i in xrange(9):
+                t[i] = yices_eq(x, self.numerals[i+1])
+            return yices_or(9, t)
+###            return yices_and2(yices_arith_leq_atom(one, x), yices_arith_leq_atom(x, nine))
         for i in xrange(9):
             for j in xrange(9):
                 yices_assert_formula(self.context, between_1_and_9(self.variables[i][j]))
