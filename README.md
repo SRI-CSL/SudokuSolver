@@ -5,7 +5,8 @@ A simple sudoku puzzle solver using the new python bindings for yices.
 ## Prerequisites
 
 You will need to install [yices](https://github.com/SRI-CSL/yices2) which can be done by building from source,
-or using apt on linux (from our PPA) or homebrew on a mac, the readme there describes the process.
+or using apt on linux (from our PPA) or homebrew on a mac, the [README.md](https://github.com/SRI-CSL/yices2/blob/master/README.md) 
+there describes the process.
 
 You will also need the python bindings:
 ```
