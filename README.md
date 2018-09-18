@@ -5,7 +5,8 @@ A simple sudoku puzzle solver using the new python bindings for yices.
 ## Prerequisites
 
 You will need to install [yices](https://github.com/SRI-CSL/yices2) which can be done by building from source,
-or using apt on linux (from our PPA) or homebrew on a mac, the readme there describes the process.
+or using apt on linux (from our PPA) or homebrew on a mac, the [README.md](https://github.com/SRI-CSL/yices2/blob/master/README.md) 
+there describes the process.
 
 You will also need the python bindings:
 ```
@@ -28,11 +29,7 @@ can clear the entries too.  There are a couple of built in boards, so you can st
 add a few entries and then solve. Seems like the `l33t` board has 158 solutions, which I think means it is not a
 legal puzzle.
 
-I think legal sudoku puzzles should have unique solutions.
-If you try and solve a puzzle that has many solutions you may be in for a long wait.
-
-You can also ask for the number of solutions, but be careful, if there are a lot (i.e. the puzzle in near to empty)
-then this will take time (might want to bail if the number of solutions is larger than a K?).
+You can also ask for the number of solutions, but if there are more than 64 we do not persist, and just return 64.
 
 ## Acknowledgments
 
