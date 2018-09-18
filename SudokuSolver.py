@@ -1,7 +1,34 @@
 
 from ctypes import c_int32
 
-from yices import *
+from yices_api import (
+    yices_init,
+    yices_new_config,
+    yices_default_config_for_logic,
+    yices_new_context,
+    yices_free_context,
+    yices_free_config,
+    yices_exit,
+    yices_int_type,
+    yices_new_uninterpreted_term,
+    yices_int32,
+    yices_eq,
+    yices_or,
+    yices_and,
+    yices_not,
+    yices_assert_formula,
+    yices_arith_eq_atom,
+    yices_distinct,
+    yices_push,
+    yices_pop,
+    yices_check_context,
+    STATUS_SAT,
+    yices_get_model,
+    yices_free_model,
+    yices_get_int32_value,
+    make_empty_term_array,
+    make_term_array
+    )
 
 from SudokuBoard import SudokuBoard
 
@@ -60,7 +87,7 @@ class SudokuSolver(object):
     def __generateConstraints(self):
         # each x is between 1 and 9
         def between_1_and_9(x):
-            t = make_empty_term_array(9);
+            t = make_empty_term_array(9)
             for i in xrange(9):
                 t[i] = yices_eq(x, self.numerals[i+1])
             return yices_or(9, t)
@@ -103,8 +130,6 @@ class SudokuSolver(object):
                 value = self.game.puzzle[i][j]
                 if value != 0:
                     set_value(i, j, value)
-
-
     def solve(self):
 
         """Attempts to solve the puzzle, returning either None if there is no solution, or a board with the correct MISSING entries."""
