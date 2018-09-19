@@ -1,38 +1,22 @@
 
-from ctypes import c_int32
-
-from yices_api import (
-    yices_init,
-    yices_new_config,
-    yices_default_config_for_logic,
-    yices_new_context,
-    yices_free_context,
-    yices_free_config,
-    yices_exit,
-    yices_int_type,
-    yices_new_uninterpreted_term,
-    yices_int32,
-    yices_eq,
-    yices_or,
-    yices_and,
-    yices_not,
-    yices_assert_formula,
-    yices_arith_eq_atom,
-    yices_distinct,
-    yices_push,
-    yices_pop,
-    yices_check_context,
-    STATUS_SAT,
-    yices_get_model,
-    yices_free_model,
-    yices_get_int32_value,
-    make_empty_term_array,
-    make_term_array
-    )
-
 from SudokuBoard import SudokuBoard
 
 from Constants import ALEPH_NOUGHT
+
+from yices.Types import Types
+
+from yices.Terms import Terms
+
+from yices.Config import Config
+
+from yices.Context import Context
+
+from yices.Status import Status
+
+from yices.Model import Model
+
+from yices.Yices import Yices
+
 
 class SudokuSolver(object):
 
@@ -45,75 +29,65 @@ class SudokuSolver(object):
     """
     def __init__(self, game):
         self.game = game
-        yices_init()
         # the matrix of uninterpreted terms
         self.variables = self.__createVariables()
         # the numerals as yices constants
         self.numerals = self.__createNumerals()
         # the yices configuration for puzzle solving
-        self.config = yices_new_config()
+        self.config = Config()
         # is push and pop the default (yes; had to look at the source though.)
-        yices_default_config_for_logic(self.config, "QF_LIA")
+        self.config.default_config_for_logic("QF_LIA")
         # the context (a set/stack of yices assertions)
-        self.context = yices_new_context(self.config)
+        self.context = Context(self.config)
         # add the generic constraints (corresponding to the rules of the game)
         self.__generateConstraints()
 
 
     # would take some (unnecessary) effort to hook these in somewhere
     def __cleanUp(self):
-        yices_free_context(self.context)
-        yices_free_config(self.config)
-        yices_exit()
+        self.context.dispose()
+        self.config.dispose()
+        Yices.exit()
 
 
     def __createVariables(self):
         """Creates the matrix of uninterpreted terms that represents the logical view of the board."""
-        int_t = yices_int_type()
+        int_t = Types.int_type()
         variables = SudokuBoard.newBoard()
         for i in xrange(9):
             for j in xrange(9):
-                variables[i][j] = yices_new_uninterpreted_term(int_t)
+                variables[i][j] = Terms.new_uninterpreted_term(int_t)
         return variables
 
     def __createNumerals(self):
         """Creates a mapping from digits to yices constants for those digits."""
         numerals = {}
         for i in xrange(1, 10):
-            numerals[i] = yices_int32(i)
+            numerals[i] = Terms.integer(i)
         return numerals
 
 
     def __generateConstraints(self):
         # each x is between 1 and 9
         def between_1_and_9(x):
-            t = make_empty_term_array(9)
-            for i in xrange(9):
-                t[i] = yices_eq(x, self.numerals[i+1])
-            return yices_or(9, t)
+            return Terms.disjunction([Terms.eq(x, self.numerals[i+1]) for i in xrange(9)])
         for i in xrange(9):
             for j in xrange(9):
-                yices_assert_formula(self.context, between_1_and_9(self.variables[i][j]))
-
-        # all elements of the array x are distinct
-        def all_distinct(x):
-            n = len(x)
-            a = make_term_array(x)
-            return yices_distinct(n, a)
+                self.context.assert_formula(between_1_and_9(self.variables[i][j]))
 
         # All elements in a row must be distinct
         for i in xrange(9):
-            yices_assert_formula(self.context, all_distinct([self.variables[i][j] for j in xrange(9)]))
+            self.context.assert_formula(Terms.distinct([self.variables[i][j] for j in xrange(9)]))
 
 
         # All elements in a column must be distinct
         for i in xrange(9):
-            yices_assert_formula(self.context, all_distinct([self.variables[j][i] for j in xrange(9)]))
+            self.context.assert_formula(Terms.distinct([self.variables[j][i] for j in xrange(9)]))
 
         # All elements in each 3x3 square must be distinct
         for k in xrange(3):
             for l in xrange(3):
-                yices_assert_formula(self.context, all_distinct([self.variables[i + 3 * l][j + 3 * k] for i in xrange(3) for j in xrange(3)]))
+                self.context.assert_formula(Terms.distinct([self.variables[i + 3 * l][j + 3 * k] for i in xrange(3) for j in xrange(3)]))
 
 
     def __addFacts(self):
@@ -122,7 +96,7 @@ class SudokuSolver(object):
             assert 0 <= row and row < 9
             assert 0 <= column and column < 9
             assert 1 <= value and value <= 9
-            yices_assert_formula(self.context, yices_arith_eq_atom(self.variables[row][column], self.numerals[value]))
+            self.context.assert_formula(Terms.arith_eq_atom(self.variables[row][column], self.numerals[value]))
 
 
         for i in xrange(9):
@@ -136,18 +110,17 @@ class SudokuSolver(object):
         solution = None
 
         #we use push and pop so that we can solve (variants) repeatedly without having to start from scratch each time.
-        yices_push(self.context)
+        self.context.push()
 
         self.__addFacts()
 
-        smt_stat = yices_check_context(self.context, None)
+        smt_stat = self.context.check_context(None)
 
-        if smt_stat != STATUS_SAT:
+        if smt_stat != Status.SAT:
             print 'No solution: smt_stat = {0}\n'.format(smt_stat)
         else:
             #get the model
-            model = yices_get_model(self.context, 1)
-            val = c_int32()
+            model = Model.from_context(self.context, 1)
 
             #return the model as a board with ONLY the newly found values inserted.
             solution = SudokuBoard.newBoard()
@@ -155,13 +128,11 @@ class SudokuSolver(object):
             for i in xrange(9):
                 for j in xrange(9):
                     if self.game.puzzle[i][j] == 0:
-                        yices_get_int32_value(model, self.variables[i][j], val)
-                        #print 'V({0}, {1}) = {2}'.format(i, j, val.value)
-                        solution[i][j] = val.value
+                        solution[i][j] = model.get_value(self.variables[i][j])
 
-            yices_free_model(model)
+            model.dispose()
 
-        yices_pop(self.context)
+        self.context.pop()
 
         return solution
 
@@ -171,31 +142,30 @@ class SudokuSolver(object):
 
         def model2term(model):
             termlist = []
-            val = c_int32()
             for i in xrange(9):
                 for j in xrange(9):
                     if self.game.puzzle[i][j] == 0:
-                        yices_get_int32_value(model, self.variables[i][j], val)
+                        val = model.get_value(self.variables[i][j])
                         var = self.variables[i][j]
-                        value = self.numerals[val.value]
-                        termlist.append(yices_arith_eq_atom(var, value))
-            return yices_and(len(termlist), make_term_array(termlist))
+                        value = self.numerals[val]
+                        termlist.append(Terms.arith_eq_atom(var, value))
+            return Terms.conjunction(termlist)
 
         result = 0
 
-        yices_push(self.context)
+        self.context.push()
 
         self.__addFacts()
 
-        while  yices_check_context(self.context, None) == STATUS_SAT:
-            model = yices_get_model(self.context, 1)
+        while  self.context.check_context(None) == Status.SAT:
+            model = Model.from_context(self.context, 1)
             diagram = model2term(model)
-            yices_assert_formula(self.context, yices_not(diagram))
-            yices_free_model(model)
+            self.context.assert_formula(Terms.negation(diagram))
+            model.dispose()
             result += 1
             if result == ALEPH_NOUGHT:
                 break
 
-        yices_pop(self.context)
+        self.context.pop()
 
         return result
