@@ -70,7 +70,7 @@ class SudokuSolver(object):
     def __generateConstraints(self):
         # each x is between 1 and 9
         def between_1_and_9(x):
-            return Terms.disjunction([Terms.eq(x, self.numerals[i+1]) for i in xrange(9)])
+            return Terms.yor([Terms.eq(x, self.numerals[i+1]) for i in xrange(9)])
         for i in xrange(9):
             for j in xrange(9):
                 self.context.assert_formula(between_1_and_9(self.variables[i][j]))
@@ -149,7 +149,7 @@ class SudokuSolver(object):
                         var = self.variables[i][j]
                         value = self.numerals[val]
                         termlist.append(Terms.arith_eq_atom(var, value))
-            return Terms.conjunction(termlist)
+            return Terms.yand(termlist)
 
         result = 0
 
@@ -160,7 +160,7 @@ class SudokuSolver(object):
         while  self.context.check_context(None) == Status.SAT:
             model = Model.from_context(self.context, 1)
             diagram = model2term(model)
-            self.context.assert_formula(Terms.negation(diagram))
+            self.context.assert_formula(Terms.ynot(diagram))
             model.dispose()
             result += 1
             if result == ALEPH_NOUGHT:
