@@ -3,19 +3,15 @@ from SudokuBoard import SudokuBoard
 
 from Constants import ALEPH_NOUGHT
 
-from yices.Types import Types
+from yices import *
 
-from yices.Terms import Terms
-
-from yices.Config import Config
-
-from yices.Context import Context
-
-from yices.Status import Status
-
-from yices.Model import Model
-
-from yices.Yices import Yices
+#from yices.Types import Types
+#from yices.Terms import Terms
+#from yices.Config import Config
+#from yices.Context import Context
+#from yices.Status import Status
+#from yices.Model import Model
+#from yices.Yices import Yices
 
 
 class SudokuSolver(object):
